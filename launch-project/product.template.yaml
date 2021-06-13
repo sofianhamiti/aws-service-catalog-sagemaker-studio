@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create MLOps Project from Project Template
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: <ADD PROJECT NAME HERE>
+  Description:
+    Type: String
+    Default: <ADD DESCRIPTION HERE>
+  ProductId:
+    Type: String
+    Default: <ADD PROJECT TEMPLATE ID HERE>
+  ProductVersionId:
+    Type: String
+    Default: <ADD TEMPLATE VERSION ID HERE>
+
+Resources:
+  #================================================================================
+  # LAUNCH PROJECT FROM PROJECT TEMPLATE ID
+  #================================================================================
+  Project:
+    Type: AWS::SageMaker::Project
+    Properties:
+      ProjectName: !Ref ProjectName
+      ProjectDescription: !Ref Description
+      ServiceCatalogProvisioningDetails:
+        ProductId: !Ref ProductId
+        ProvisioningArtifactId: !Ref ProductVersionId

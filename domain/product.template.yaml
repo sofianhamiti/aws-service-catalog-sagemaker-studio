@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create Studio domain
+
+Resources:
+  #================================================================================
+  # IAM ROLES
+  #================================================================================
+  IAM:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: ./templates/iam_template.yaml
+  #================================================================================
+  # STUDIO DOMAIN
+  #================================================================================
+  STUDIO:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      Parameters:
+        LambdaExecutionRoleArn: !GetAtt IAM.Outputs.LambdaExecutionRoleArn
+        SageMakerExecutionRoleArn: !GetAtt IAM.Outputs.SageMakerExecutionRoleArn
+      TemplateURL: ./templates/studio_template.yaml

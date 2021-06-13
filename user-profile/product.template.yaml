@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create Studio User Profile
+
+Parameters:
+  DomainId:
+    Type: String
+    Default: <ADD DOMAIN ID HERE>
+  ProfileName:
+    Type: String
+    Default: <ADD THE PROFILE NAME HERE>
+  EnableProjectsLambdaArn:
+    Type: String
+    Default: <ADD CFEnableSagemakerProjects LAMBDA FUNCTION ARN HERE>
+
+Resources:
+  #================================================================================
+  # IAM ROLE FOR USER PROFILE
+  #================================================================================
+  UserRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Policies:
+        - PolicyName: s3-access
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                Resource: arn:aws:s3:::*
+        - PolicyName: iam-access
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:GetRole
+                  - iam:GetRolePolicy
+                Resource: '*'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - sagemaker.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+        - arn:aws:iam::aws:policy/AWSCodePipeline_FullAccess
+
+  #================================================================================
+  # USER PROFILE
+  #================================================================================
+  UserProfile:
+    Type: AWS::SageMaker::UserProfile
+    Properties:
+      DomainId: !Ref DomainId
+      UserProfileName: !Ref ProfileName
+      UserSettings:
+        ExecutionRole: !GetAtt UserRole.Arn
+
+  #================================================================================
+  # ENABLE PROJECTS
+  #================================================================================
+  EnableProjects:
+    Type: Custom::ResourceForEnablingSageMakerProjects
+    Properties:
+      ServiceToken: !Ref EnableProjectsLambdaArn
+      ExecutionRole: !GetAtt UserRole.Arn
