@@ -187,7 +187,7 @@ Resources:
   StudioImage:
     Type: AWS::SageMaker::Image
     Properties:
-      ImageDescription: Tensorflow 2.5.0 in Studio
+      ImageDescription: !Ref ImageName
       ImageDisplayName: !Ref ImageName
       ImageName: !Ref ImageName
       ImageRoleArn: !Ref ImageRoleArn
